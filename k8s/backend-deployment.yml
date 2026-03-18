@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: three-tier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: muthu42doc/backend-k8s:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: mysql-service
+            - name: DB_USER
+              value: myuser
+            - name: DB_PASSWORD
+              value: mypassword
+            - name: DB_NAME
+              value: employee_db
