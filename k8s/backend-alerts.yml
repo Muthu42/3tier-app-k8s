@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: backend-alerts
+  namespace: default
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: backend.rules
+      rules:
+        - alert: BackendDown
+          expr: absent(up{job="backend-metrics"}) or up{job="backend-metrics"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Backend is down"
+            description: "Prometheus cannot scrape backend-metrics for more than 1 minute."
+
+        - alert: High500Errors
+          expr: increase(http_requests_total{job="backend-metrics",status_code="500"}[2m]) > 3
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High number of 500 errors"
+            description: "Backend returned more than 3 HTTP 500 errors in the last 2 minutes."
