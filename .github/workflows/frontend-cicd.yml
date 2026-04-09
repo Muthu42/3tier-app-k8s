@@ -39,12 +39,12 @@ jobs:
 
       - name: Update frontend image in manifest
         run: |
-          sed -i "s|image: .*frontend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-k8s:${IMAGE_TAG}|g" k8s/frontend-deployment.yaml
+          sed -i "s|image: .*frontend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-k8s:${IMAGE_TAG}|g" k8s/frontend-deployment.yml
 
       - name: Commit and push updated manifest
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add k8s/frontend-deployment.yaml
+          git add k8s/frontend-deployment.yml
           git commit -m "Update frontend image to ${IMAGE_TAG}" || echo "No changes to commit"
           git push
