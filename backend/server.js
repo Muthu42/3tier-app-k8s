@@ -34,6 +34,29 @@ app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
+app.get("/users", (req, res) => {
+  writeLog("Users endpoint accessed");
+
+  const sql = "SELECT id, name, email FROM users";
+
+  pool.query(sql, (err, result) => {
+    if (err) {
+      console.log("SQL Error:", err.message);
+      writeLog(`Database error while fetching users: ${err.message}`);
+      return res.status(500).json({
+        success: false,
+        message: "Database error",
+        error: err.message
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: result
+    });
+  });
+});
+
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -71,3 +94,6 @@ app.post("/login", (req, res) => {
 app.listen(5000, "0.0.0.0", () => {
   console.log("Server running on port 5000");
 });
+
+
+// test backend cicd
