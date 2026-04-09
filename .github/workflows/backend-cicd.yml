@@ -39,12 +39,12 @@ jobs:
 
       - name: Update backend image in manifest
         run: |
-          sed -i "s|image: .*backend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/backend-k8s:${IMAGE_TAG}|g" k8s/backend-deployment.yaml
+          sed -i "s|image: .*backend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/backend-k8s:${IMAGE_TAG}|g" k8s/backend-deployment.yml
 
       - name: Commit and push updated manifest
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add k8s/backend-deployment.yaml
+          git add k8s/backend-deployment.yml
           git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
           git push
