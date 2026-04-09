@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: muthu42doc/backend-k8s:latest
+          image: muthu42doc/backend-k8s:cee8038
           ports:
             - containerPort: 5000
           env:
