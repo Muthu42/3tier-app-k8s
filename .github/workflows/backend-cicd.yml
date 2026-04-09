@@ -46,5 +46,12 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add k8s/backend-deployment.yml
-          git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No manifest changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Update backend image to ${IMAGE_TAG}"
+          git pull origin main --rebase
+          git push origin main
