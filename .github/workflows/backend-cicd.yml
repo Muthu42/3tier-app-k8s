@@ -9,12 +9,18 @@ on:
       - '.github/workflows/backend-cicd.yml'
 
 jobs:
-  build-and-deploy:
+  build-and-update-manifest:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -27,14 +33,18 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend-k8s:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/backend-k8s:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/backend-k8s:${{ env.IMAGE_TAG }}
 
-      - name: Deploy to Kubernetes on EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            kubectl rollout restart deployment backend -n three-tier
-            kubectl rollout status deployment backend -n three-tier
+      - name: Update backend image in manifest
+        run: |
+          sed -i "s|image: .*backend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/backend-k8s:${IMAGE_TAG}|g" k8s/backend-deployment.yaml
+
+      - name: Commit and push updated manifest
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add k8s/backend-deployment.yaml
+          git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
+          git push
