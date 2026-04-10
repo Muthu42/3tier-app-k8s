@@ -40,7 +40,7 @@ jobs:
 
       - name: Update frontend image in manifest
         run: |
-          sed -i "s|image: .*frontend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-k8s:${IMAGE_TAG}|g" k8s/frontend-deployment.yaml
+          sed -i "s|image: .*frontend-k8s:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-k8s:${IMAGE_TAG}|g" k8s/frontend-deployment.yml
 
       - name: Commit and push updated manifest
         run: |
